@@ -1,9 +1,11 @@
 import type { CollectionConfig } from 'payload'
 
-export const BudgetItem: CollectionConfig = {
-  slug: 'budgetItem',
+export const BudgetCategory: CollectionConfig = {
+  slug: 'budgetCategory',
+  admin: { useAsTitle: 'name' },
   access: {
     read: () => true,
+    create: () => true,
   },
   fields: [
     {
@@ -17,6 +19,6 @@ export const BudgetItem: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    { name: 'iconUrl', type: 'upload', relationTo: 'media' },
   ],
-  
 }

@@ -69,7 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    budgetItem: BudgetItem;
+    budgetCategory: BudgetCategory;
+    budget: Budget;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -78,7 +79,8 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    budgetItem: BudgetItemSelect<false> | BudgetItemSelect<true>;
+    budgetCategory: BudgetCategorySelect<false> | BudgetCategorySelect<true>;
+    budget: BudgetSelect<false> | BudgetSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -153,12 +155,32 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgetItem".
+ * via the `definition` "budgetCategory".
  */
-export interface BudgetItem {
+export interface BudgetCategory {
   id: string;
   name: string;
   color: string;
+  iconUrl?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget".
+ */
+export interface Budget {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  categories?:
+    | {
+        amountToSpend?: number | null;
+        category?: (string | null) | BudgetCategory;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -178,8 +200,12 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'budgetItem';
-        value: string | BudgetItem;
+        relationTo: 'budgetCategory';
+        value: string | BudgetCategory;
+      } | null)
+    | ({
+        relationTo: 'budget';
+        value: string | Budget;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -258,11 +284,30 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgetItem_select".
+ * via the `definition` "budgetCategory_select".
  */
-export interface BudgetItemSelect<T extends boolean = true> {
+export interface BudgetCategorySelect<T extends boolean = true> {
   name?: T;
   color?: T;
+  iconUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget_select".
+ */
+export interface BudgetSelect<T extends boolean = true> {
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  categories?:
+    | T
+    | {
+        amountToSpend?: T;
+        category?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
