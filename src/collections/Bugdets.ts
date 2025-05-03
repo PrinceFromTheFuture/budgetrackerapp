@@ -29,16 +29,18 @@ export const Bugdets: CollectionConfig = {
       type: 'array',
       name: 'categories',
       fields: [
-        { name: 'amount', type: 'number' },
+        { name: 'amount', type: 'number' ,required:true},
         {
           name: 'type',
           type: 'select',
+          
           options: [
             { label: 'income', value: 'income' },
             { label: 'expense', value: 'expense' },
           ],
+          required:true
         },
-        { type: 'relationship', name: 'category', relationTo: 'budgetCategories' },
+        { type: 'relationship', name: 'category', relationTo: 'budgetCategories',required:true },
       ],
     },
   ],

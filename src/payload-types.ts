@@ -182,9 +182,9 @@ export interface Budget {
   endDate: string;
   categories?:
     | {
-        amount?: number | null;
-        type?: ('income' | 'expense') | null;
-        category?: (string | null) | BudgetCategory;
+        amount: number;
+        type: 'income' | 'expense';
+        category: string | BudgetCategory;
         id?: string | null;
       }[]
     | null;

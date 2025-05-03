@@ -102,6 +102,7 @@ import {
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import dayjs from 'dayjs'
 
 export const schema = z.object({
   id: z.string(),
@@ -196,21 +197,22 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       const icon = cat.iconUrl as unknown as Media
       return (
         <Badge
-          variant="outline"
-          className={cn('text-white px-1.5', ` `)}
+          variant="default"
+          className={cn('text-white font-semibold px-1.5', ` `)}
           style={{ backgroundColor: cat.color }}
         >
-          <img src={icon.url!.toString()} alt="" />
+          <img className=" text-white" src={String(icon.url)} alt="" />
           {cat.name}
         </Badge>
       )
     },
   },
   {
-    accessorKey: 'target',
-    header: () => <div className="w-full text-right">Target</div>,
+    accessorKey: 'amount',
+    header: () => <div className="w-full ">Amount</div>,
     cell: ({ row }) => (
       <form
+        className=" w-32"
         onSubmit={(e) => {
           e.preventDefault()
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
@@ -221,19 +223,15 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         }}
       >
         <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
+          Amount
         </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.category}
-          id={`${row.original.id}-target`}
-        />
+        <div className=" text-black">{row.original.amount}</div>
       </form>
     ),
   },
   {
-    accessorKey: 'limit',
-    header: () => <div className="w-full text-right">Limit</div>,
+    accessorKey: 'date',
+    header: () => <div className="w-full ">Date</div>,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
@@ -246,47 +244,24 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         }}
       >
         <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
+          Date
         </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.amount}
-          id={`${row.original.id}-limit`}
-        />
+        Fri, 02 May 2025 17:36:
+        <div className=" text-black">{dayjs(row.original.date).format('ddd, DD MMM YYYY, HH:mm')}</div>
       </form>
     ),
   },
   {
-    accessorKey: 'reviewer',
-    header: 'Reviewer',
-    cell: ({ row }) => {
-      const isAssigned = row.original.name !== 'Assign reviewer'
-
-      if (isAssigned) {
-        return row.original.amount
-      }
-
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      )
-    },
+    accessorKey: 'paymentMethod',
+    header: () => <div className="w-full ">PaymentMethod</div>,
+    cell: ({ row }) => (
+      <div>
+        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
+          Date
+        </Label>
+        <div className=" text-black">{row.original.paymentMethod.name}</div>
+      </div>
+    ),
   },
   {
     id: 'actions',
@@ -616,12 +591,12 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
     <Drawer direction={isMobile ? 'bottom' : 'right'}>
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.createdAt}
+          {item.name}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.account}</DrawerTitle>
+          <DrawerTitle>{item.account.name}</DrawerTitle>
           <DrawerDescription>Showing total visitors for the last 6 months</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
@@ -680,12 +655,12 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.account} />
+              <Input id="header" defaultValue={item.account.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.account}>
+                <Select defaultValue={item.account.name}>
                   <SelectTrigger id="type" className="w-full">
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
@@ -703,7 +678,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.account}>
+                <Select defaultValue={item.account.name}>
                   <SelectTrigger id="status" className="w-full">
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
@@ -718,16 +693,16 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.account} />
+                <Input id="target" defaultValue={item.account.name} />
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.account} />
+                <Input id="limit" defaultValue={item.account.name} />
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.account}>
+              <Select defaultValue={item.account.name}>
                 <SelectTrigger id="reviewer" className="w-full">
                   <SelectValue placeholder="Select a reviewer" />
                 </SelectTrigger>
