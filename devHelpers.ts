@@ -1,0 +1,1 @@
+export const log = (val:any)=>console.log(val)

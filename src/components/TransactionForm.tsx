@@ -1,6 +1,6 @@
 'use client'
-import React, { ReactNode, useState } from 'react'
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import React, { ReactNode, useEffect, useState } from 'react'
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui/dialog'
 import {
   Form,
   FormControl,
@@ -21,6 +21,10 @@ import { Calendar } from './ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import dayjs from 'dayjs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import axios from 'axios'
+import { Collection } from 'payload'
+import { Account, BudgetCategory, PaymentMethod } from '@/payload-types'
+import { transactionSchema } from '@/app/api/transactions/route'
 interface Props {
   trigger: ReactNode
 }
@@ -29,14 +33,43 @@ const TransactionForm = ({ trigger }: Props) => {
   const [date, setDate] = useState<Date>(dayjs().toDate())
   const [time, setTime] = useState<string>(dayjs().format('HH:mm'))
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+
+  const [selectFileds, setSelectFields] = useState<[Account[], PaymentMethod[], BudgetCategory[]]>([
+    [],
+    [],
+    [],
+  ])
+
   const formSchema = z.object({ title: z.string() })
   const form = useForm<z.infer<typeof formSchema>>({ resolver: zodResolver(formSchema) })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+
+  useEffect(() => {
+    const getDate = async () => {
+      const accounts: { data: { docs: Account[] } } = await axios.get('/api/accounts', {})
+      const paymentMethods: { data: { docs: PaymentMethod[] } } = await axios.get(
+        '/api/paymentMethods',
+        {},
+      )
+      const budgetCategories: { data: { docs: BudgetCategory[] } } = await axios.get(
+        '/api/budgetCategories',
+        {},
+      )
+
+      setSelectFields([accounts.data.docs, paymentMethods.data.docs, budgetCategories.data.docs])
+    }
+    getDate()
+  }, [])
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    axios.post('/api/transactions', {
+      name: values.title,
+      timestamps: dayjs(date).format('YYYY-MM-DD') + ' ' + time,
+      amount: 0,
+      category: selectFileds[2][0].id,
+      account: selectFileds[0][0].id,
+      paymentMethod: selectFileds[1][0].id,
+    })
   }
 
   return (
@@ -117,27 +150,32 @@ const TransactionForm = ({ trigger }: Props) => {
                 )}
               />
             </div>
-            <Select>
-              <SelectTrigger className="w-1/2">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-1/2">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button type="submit">Submit</Button>
+            {selectFileds.map((selectField, index) => {
+
+              return (
+                <Select key={index}>
+                  <SelectTrigger className="w-1/2">
+                    <SelectValue placeholder="Theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectField.map((field) => {
+                  
+
+                      return (
+                        <SelectItem key={field.id} value={field.id}>
+                          {field.name}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+              )
+            })}
+            <DialogClose asChild>
+              <Button type="submit" className=" cursor-pointer">
+                Submit
+              </Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

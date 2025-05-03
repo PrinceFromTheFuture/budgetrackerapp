@@ -1,8 +1,8 @@
 import { relationship } from 'node_modules/payload/dist/fields/validations'
 import type { CollectionConfig } from 'payload'
 
-export const Bugdet: CollectionConfig = {
-  slug: 'budget',
+export const Bugdets: CollectionConfig = {
+  slug: 'budgets',
   access: {
     read: () => true,
     create: () => true,
@@ -29,8 +29,16 @@ export const Bugdet: CollectionConfig = {
       type: 'array',
       name: 'categories',
       fields: [
-        { name: 'amountToSpend', type: 'number' },
-        { type: 'relationship', name: 'category', relationTo: 'budgetCategory', },
+        { name: 'amount', type: 'number' },
+        {
+          name: 'type',
+          type: 'select',
+          options: [
+            { label: 'income', value: 'income' },
+            { label: 'expense', value: 'expense' },
+          ],
+        },
+        { type: 'relationship', name: 'category', relationTo: 'budgetCategories' },
       ],
     },
   ],

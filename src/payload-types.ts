@@ -69,8 +69,11 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    budgetCategory: BudgetCategory;
-    budget: Budget;
+    budgetCategories: BudgetCategory;
+    budgets: Budget;
+    accounts: Account;
+    paymentMethods: PaymentMethod;
+    transactions: Transaction;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -79,8 +82,11 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    budgetCategory: BudgetCategorySelect<false> | BudgetCategorySelect<true>;
-    budget: BudgetSelect<false> | BudgetSelect<true>;
+    budgetCategories: BudgetCategoriesSelect<false> | BudgetCategoriesSelect<true>;
+    budgets: BudgetsSelect<false> | BudgetsSelect<true>;
+    accounts: AccountsSelect<false> | AccountsSelect<true>;
+    paymentMethods: PaymentMethodsSelect<false> | PaymentMethodsSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -155,7 +161,7 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgetCategory".
+ * via the `definition` "budgetCategories".
  */
 export interface BudgetCategory {
   id: string;
@@ -167,7 +173,7 @@ export interface BudgetCategory {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budget".
+ * via the `definition` "budgets".
  */
 export interface Budget {
   id: string;
@@ -176,11 +182,54 @@ export interface Budget {
   endDate: string;
   categories?:
     | {
-        amountToSpend?: number | null;
+        amount?: number | null;
+        type?: ('income' | 'expense') | null;
         category?: (string | null) | BudgetCategory;
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accounts".
+ */
+export interface Account {
+  id: string;
+  name: string;
+  color: string;
+  balance: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paymentMethods".
+ */
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  color: string;
+  isCredit?: boolean | null;
+  resetDate?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: string;
+  name: string;
+  description: string;
+  type?: ('income' | 'expense' | 'transfer') | null;
+  date: string;
+  paymentMethod?: (string | null) | PaymentMethod;
+  account?: (string | null) | Account;
+  amount: number;
+  category: string | BudgetCategory;
   updatedAt: string;
   createdAt: string;
 }
@@ -200,12 +249,24 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'budgetCategory';
+        relationTo: 'budgetCategories';
         value: string | BudgetCategory;
       } | null)
     | ({
-        relationTo: 'budget';
+        relationTo: 'budgets';
         value: string | Budget;
+      } | null)
+    | ({
+        relationTo: 'accounts';
+        value: string | Account;
+      } | null)
+    | ({
+        relationTo: 'paymentMethods';
+        value: string | PaymentMethod;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: string | Transaction;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -284,9 +345,9 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgetCategory_select".
+ * via the `definition` "budgetCategories_select".
  */
-export interface BudgetCategorySelect<T extends boolean = true> {
+export interface BudgetCategoriesSelect<T extends boolean = true> {
   name?: T;
   color?: T;
   iconUrl?: T;
@@ -295,19 +356,59 @@ export interface BudgetCategorySelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budget_select".
+ * via the `definition` "budgets_select".
  */
-export interface BudgetSelect<T extends boolean = true> {
+export interface BudgetsSelect<T extends boolean = true> {
   name?: T;
   startDate?: T;
   endDate?: T;
   categories?:
     | T
     | {
-        amountToSpend?: T;
+        amount?: T;
+        type?: T;
         category?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accounts_select".
+ */
+export interface AccountsSelect<T extends boolean = true> {
+  name?: T;
+  color?: T;
+  balance?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paymentMethods_select".
+ */
+export interface PaymentMethodsSelect<T extends boolean = true> {
+  name?: T;
+  color?: T;
+  isCredit?: T;
+  resetDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  type?: T;
+  date?: T;
+  paymentMethod?: T;
+  account?: T;
+  amount?: T;
+  category?: T;
   updatedAt?: T;
   createdAt?: T;
 }

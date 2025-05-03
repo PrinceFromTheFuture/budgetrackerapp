@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
-export const BudgetCategory: CollectionConfig = {
-  slug: 'budgetCategory',
+export const BudgetCategories: CollectionConfig = {
+  slug: 'budgetCategories',
   admin: { useAsTitle: 'name' },
   access: {
     read: () => true,
